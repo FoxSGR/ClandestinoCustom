@@ -1,0 +1,9 @@
+name: Ajuda
+version: 0.0.1
+author: FoxSGR
+main: clandestino.pluginajuda.Main
+
+commands:
+  ajuda:
+    description: Obter ajuda.
+    usage: "Uso correto: /ajuda proteger"
