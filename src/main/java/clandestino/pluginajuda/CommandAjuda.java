@@ -19,15 +19,40 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class CommandAjuda implements CommandExecutor {
+/**
+ * Comando principal do plugin. Apresenta as ajudas disponíveis
+ */
+public final class CommandAjuda implements CommandExecutor {
 
+    /**
+     * O comando.
+     */
     static final String COMMAND_NAME = "ajuda";
+
+    /**
+     * O plugin em que o comando está registado.
+     */
     private final JavaPlugin plugin;
 
+    /**
+     * Cria o comando.
+     *
+     * @param plugin o plugin em que o comando está registado.
+     */
     CommandAjuda(JavaPlugin plugin) {
         this.plugin = plugin;
     }
 
+    /**
+     * Executa o comando, mostrando as ajudas disponíveis se não tiverem sido enviados argumentos ou mostrando o
+     * conteúdo da ajuda escolhida se tiver sido enviado algum argumento.
+     *
+     * @param sender
+     * @param command
+     * @param label
+     * @param args
+     * @return
+     */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
@@ -37,7 +62,7 @@ public class CommandAjuda implements CommandExecutor {
         }
 
         try {
-            sender.sendMessage(ajuda(args[0]));
+            sender.sendMessage(ajuda(args));
         } catch (IOException e) {
             sender.sendMessage(ChatColor.RED + "Ajuda inválida.\n" + ChatColor.GREEN + "Ajudas disponíveis: "
                     + ChatColor.BLUE + ajudas());
@@ -46,7 +71,8 @@ public class CommandAjuda implements CommandExecutor {
         return true;
     }
 
-    private String ajuda(String name) throws IOException {
+    private String ajuda(String[] args) throws IOException {
+        String name = String.join(" ", args);
         name = name.toLowerCase();
 
         try (Stream<Path> walk = Files.walk(Paths.get(plugin.getDataFolder().toURI()))) {
