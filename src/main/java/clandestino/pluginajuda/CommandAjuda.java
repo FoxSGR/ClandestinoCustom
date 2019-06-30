@@ -71,6 +71,7 @@ public final class CommandAjuda implements CommandExecutor {
         return true;
     }
 
+    @SuppressWarnings("squid:S3457")
     private String ajuda(String[] args) throws IOException {
         String name = String.join(" ", args);
         name = name.toLowerCase();
@@ -81,7 +82,8 @@ public final class CommandAjuda implements CommandExecutor {
             for (Path path : paths) {
                 String fileName = path.getFileName().toString().toLowerCase();
                 if (path.toFile().isFile() && fileName.contains(name)) {
-                    return contentFromFile(path.toUri()).replaceAll("&", "§");
+                    String content = contentFromFile(path.toUri()).replaceAll("&", "§");
+                    return String.format("§6---\n%s\n§6---", content);
                 }
             }
 
@@ -100,7 +102,7 @@ public final class CommandAjuda implements CommandExecutor {
                 ajudas.append(fileName);
 
                 if (i != files.size() - 1) {
-                    ajudas.append(", ");
+                    ajudas.append("§a, ").append(ChatColor.BLUE.toString());
                 }
             }
 
