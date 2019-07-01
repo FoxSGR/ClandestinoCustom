@@ -1,5 +1,6 @@
 package clandestino.pluginajuda;
 
+import clandestino.lib.FileUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -9,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -89,7 +88,7 @@ public final class CommandAjuda implements CommandExecutor {
             for (Path path : paths) {
                 String fileName = path.getFileName().toString().toLowerCase();
                 if (path.toFile().isFile() && fileName.contains(name)) {
-                    String content = contentFromFile(path.toUri()).replaceAll("&", "§");
+                    String content = FileUtil.contentFromFile(path).replaceAll("&", "§");
                     return String.format("§6---\n%s\n§6---", content);
                 }
             }
@@ -123,9 +122,5 @@ public final class CommandAjuda implements CommandExecutor {
             plugin.getLogger().log(Level.WARNING, e.getMessage(), e);
             return "";
         }
-    }
-
-    private static String contentFromFile(URI uri) throws IOException {
-        return new String(Files.readAllBytes(Paths.get(uri)), StandardCharsets.UTF_8);
     }
 }
