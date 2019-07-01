@@ -47,11 +47,11 @@ public final class CommandAjuda implements CommandExecutor {
      * Executa o comando, mostrando as ajudas disponíveis se não tiverem sido enviados argumentos ou mostrando o
      * conteúdo da ajuda escolhida se tiver sido enviado algum argumento.
      *
-     * @param sender
-     * @param command
-     * @param label
-     * @param args
-     * @return
+     * @param sender  a entidade que executou o comando.
+     * @param command o comando.
+     * @param label   a alias do comando usado.
+     * @param args    os argumentos do comando.
+     * @return sempre true.
      */
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -71,7 +71,14 @@ public final class CommandAjuda implements CommandExecutor {
         return true;
     }
 
-    @SuppressWarnings("squid:S3457")
+    /**
+     * Encontra o conteúdo de uma ajuda.
+     *
+     * @param args os argumentos usados no comando.
+     * @return a ajuda encontrada.
+     * @throws IOException gerada se a ajuda não for encontrada.
+     */
+    @SuppressWarnings("squid:S3457") // Tem de ser usado \n em vez de %n para mudar de linha corretamente
     private String ajuda(String[] args) throws IOException {
         String name = String.join(" ", args);
         name = name.toLowerCase();
@@ -91,6 +98,11 @@ public final class CommandAjuda implements CommandExecutor {
         }
     }
 
+    /**
+     * Encontra todas as ajudas disponíveis.
+     *
+     * @return todas as ajudas disponíveis.
+     */
     private String ajudas() {
         try (Stream<Path> walk = Files.walk(Paths.get(plugin.getDataFolder().toURI()))) {
             List<Path> files = walk.filter(Files::isRegularFile).map(Path::getFileName).collect(Collectors.toList());
