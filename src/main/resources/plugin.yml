@@ -1,7 +1,7 @@
 name: Ajuda
 version: 1.0
 author: FoxSGR
-main: clandestino.pluginajuda.Ajuda
+main: clandestino.ajuda.Ajuda
 api-version: 1.14
 
 commands:
