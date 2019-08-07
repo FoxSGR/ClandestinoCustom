@@ -1,18 +1,21 @@
-package clandestino.pluginajuda;
+package clandestino.ajuda;
 
-import clandestino.lib.FileUtil;
+import clandestino.ajuda.util.FileUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -21,12 +24,7 @@ import java.util.stream.Stream;
 /**
  * Comando principal do plugin. Apresenta as ajudas disponíveis
  */
-public final class CommandAjuda implements CommandExecutor {
-
-    /**
-     * O comando.
-     */
-    static final String COMMAND_NAME = "ajuda";
+public final class CommandAjuda implements CommandExecutor, TabCompleter {
 
     /**
      * O plugin em que o comando está registado.
@@ -70,6 +68,25 @@ public final class CommandAjuda implements CommandExecutor {
         return true;
     }
 
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+        File[] files = plugin.getDataFolder().listFiles();
+        List<String> result = new ArrayList<>();
+        if (files == null) {
+            return result;
+        }
+
+        String fileName = FileUtil.withoutExtension(String.join(" ", args)).toLowerCase();
+        for (File file : files) {
+            String currentFileName = FileUtil.withoutExtension(file.getName()).toLowerCase();
+            if (currentFileName.startsWith(fileName)) {
+                result.add(currentFileName);
+            }
+        }
+
+        return result;
+    }
+
     /**
      * Encontra o conteúdo de uma ajuda.
      *
@@ -79,15 +96,14 @@ public final class CommandAjuda implements CommandExecutor {
      */
     @SuppressWarnings("squid:S3457") // Tem de ser usado \n em vez de %n para mudar de linha corretamente
     private String ajuda(String[] args) throws IOException {
-        String name = String.join(" ", args);
-        name = name.toLowerCase();
+        String name = FileUtil.withoutExtension(String.join(" ", args));
 
         try (Stream<Path> walk = Files.walk(Paths.get(plugin.getDataFolder().toURI()))) {
             List<Path> paths = walk.collect(Collectors.toList());
 
             for (Path path : paths) {
-                String fileName = path.getFileName().toString().toLowerCase();
-                if (path.toFile().isFile() && fileName.contains(name)) {
+                String fileName = FileUtil.withoutExtension(path.getFileName().toString());
+                if (path.toFile().isFile() && fileName.equalsIgnoreCase(name)) {
                     String content = FileUtil.contentFromFile(path).replaceAll("&", "§");
                     return String.format("§6---\n%s\n§6---", content);
                 }
