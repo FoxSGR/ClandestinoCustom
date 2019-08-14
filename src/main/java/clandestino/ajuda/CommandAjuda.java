@@ -79,7 +79,7 @@ public final class CommandAjuda implements CommandExecutor, TabCompleter {
         String fileName = FileUtil.withoutExtension(String.join(" ", args)).toLowerCase();
         for (File file : files) {
             String currentFileName = FileUtil.withoutExtension(file.getName()).toLowerCase();
-            if (currentFileName.startsWith(fileName)) {
+            if (currentFileName.contains(fileName)) {
                 result.add(currentFileName);
             }
         }
