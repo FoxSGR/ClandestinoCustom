@@ -12,6 +12,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -102,9 +105,9 @@ public final class CommandAjuda implements CommandExecutor, TabCompleter {
             List<Path> paths = walk.collect(Collectors.toList());
 
             for (Path path : paths) {
-                String fileName = FileUtil.withoutExtension(path.getFileName().toString());
+                String fileName = decodeFileName(path.getFileName().toString());
                 if (path.toFile().isFile() && fileName.equalsIgnoreCase(name)) {
-                    String content = FileUtil.contentFromFile(path).replaceAll("&", "§");
+                    String content = FileUtil.contentFromFile(path).replace("&", "§").replace("\r", "");
                     return String.format("§6---\n%s\n§6---", content);
                 }
             }
@@ -120,12 +123,13 @@ public final class CommandAjuda implements CommandExecutor, TabCompleter {
      */
     private String ajudas() {
         try (Stream<Path> walk = Files.walk(Paths.get(plugin.getDataFolder().toURI()))) {
-            List<Path> files = walk.filter(Files::isRegularFile).map(Path::getFileName).collect(Collectors.toList());
+            List<String> files = walk.filter(f -> f.toFile().isFile())
+                    .map(f -> decodeFileName(f.getFileName().toString()))
+                    .collect(Collectors.toList());
 
             StringBuilder ajudas = new StringBuilder(ChatColor.BLUE.toString());
             for (int i = 0; i < files.size(); i++) {
-                String fileName = files.get(i).toString();
-                fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+                String fileName = files.get(i);
                 ajudas.append(fileName);
 
                 if (i != files.size() - 1) {
@@ -137,6 +141,17 @@ public final class CommandAjuda implements CommandExecutor, TabCompleter {
         } catch (IOException e) {
             plugin.getLogger().log(Level.WARNING, e.getMessage(), e);
             return "";
+        }
+    }
+
+    private String decodeFileName(String fileName) {
+        fileName = FileUtil.withoutExtension(fileName);
+
+        try {
+            return URLDecoder.decode(fileName, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException e) {
+            plugin.getLogger().log(Level.WARNING, e.getMessage(), e);
+            throw new IllegalStateException(e);
         }
     }
 }
