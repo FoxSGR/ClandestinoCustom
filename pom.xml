@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>clandestino</groupId>
-    <artifactId>Ajuda</artifactId>
-    <version>1.1</version>
+    <artifactId>ClandestinoCustom</artifactId>
+    <version>1.5</version>
 
     <properties>
         <java.version>8</java.version>
@@ -24,19 +24,29 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.14.3-SNAPSHOT</version>
+            <version>1.14.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>17.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.BuycraftPlugin.BuycraftX</groupId>
+            <artifactId>BuycraftX</artifactId>
+            <version>v10.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -73,5 +83,12 @@
                 </configuration>
             </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 </project>

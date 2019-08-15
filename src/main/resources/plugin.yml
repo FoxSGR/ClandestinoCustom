@@ -1,10 +1,50 @@
-name: Ajuda
-version: 1.1
+name: ${project.artifactId}
+version: ${project.version}
 author: FoxSGR
-main: clandestino.ajuda.Ajuda
+main: clandestino.CustomClandestino
 api-version: 1.14
+
+depend:
+  - Essentials
+  - BuycraftX
 
 commands:
   ajuda:
     description: Obter ajuda.
-    usage: "Uso correto: /ajuda (nome da ajuda)"
+    usage: "Uso correto: /ajuda [nome da ajuda]"
+    permission-message: You not have have permission to use this command.
+  diskspace:
+    description: Disk space analysis command.
+    usage: "Usage: /diskspace (path)"
+    permission-message: You not have have permission to use this command.
+  sellable:
+    description: Essentials worth list.
+    usage: "Usage: /sellable"
+    permission-message: You not have have permission to use this command.
+    aliases:
+      - vendiveis
+      - vendaveis
+      - valores
+      - valor
+  vantagens:
+    description: Show rank advantagens.
+    usage: "Usage: /vantagens [rank]"
+
+permissions:
+  clandestinocustom.*:
+    description: Allows every ClandestinoCustom command.
+    default: op
+    children:
+      clandestinocustom.sellable:
+        description: Allows listing every sellable item and its price.
+        default: true
+      clandestinocustom.diskspace:
+        description: Allows using the ClandestinoCustom diskspace command.
+        default: op
+      clandestinocustom.ajuda.*:
+        description: Allows every ClandestinoCustom Ajuda command.
+        default: op
+        children:
+          clandestinocustom.ajuda.reload:
+            description: Allows reloading ClandestinoCustom's ajudas command.
+            default: op
