@@ -1,11 +1,14 @@
 package clandestino.ajuda.util;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Scanner;
 
 /**
  * File related useful methods.
@@ -20,13 +23,26 @@ public final class FileUtil {
         // Should be empty.
     }
 
+    public static String contentFromFile(File file) {
+        try (Scanner scanner = new Scanner(file)) {
+            scanner.useDelimiter("\\Z");
+            return scanner.next();
+        } catch (FileNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     /**
      * Reads the entire content from a file.
      *
      * @return the content read from the file.
      */
-    public static String contentFromFile(URI uri) throws IOException {
-        return contentFromFile(Paths.get(uri));
+    public static String contentFromFile(URI uri) {
+        try {
+            return contentFromFile(Paths.get(uri));
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**

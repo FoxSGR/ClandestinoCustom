@@ -12,9 +12,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Comando principal do plugin. Apresenta as ajudas disponíveis
@@ -26,6 +27,8 @@ public final class CommandAjuda implements CommandExecutor, TabCompleter {
      */
     private final JavaPlugin plugin;
 
+    private final Map<String, String> ajudas;
+
     /**
      * Cria o comando.
      *
@@ -33,6 +36,7 @@ public final class CommandAjuda implements CommandExecutor, TabCompleter {
      */
     CommandAjuda(JavaPlugin plugin) {
         this.plugin = plugin;
+        ajudas = new HashMap<>();
     }
 
     /**
@@ -53,6 +57,13 @@ public final class CommandAjuda implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (args[0].equalsIgnoreCase("reload") && sender.hasPermission("ajuda.reload")) {
+            plugin.reloadConfig();
+            readConfig();
+            sender.sendMessage(ChatColor.AQUA + "Ajudas reloaded.");
+            return true;
+        }
+
         try {
             sender.sendMessage(ajuda(args));
         } catch (IOException e) {
@@ -65,21 +76,34 @@ public final class CommandAjuda implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        File[] files = plugin.getDataFolder().listFiles();
         List<String> result = new ArrayList<>();
-        if (files == null) {
-            return result;
-        }
-
         String fileName = FileUtil.withoutExtension(String.join(" ", args)).toLowerCase();
-        for (File file : files) {
-            String currentFileName = decodeFileName(file).toLowerCase();
-            if (currentFileName.contains(fileName)) {
-                result.add(currentFileName);
+        for (String ajuda : ajudas.keySet()) {
+            if (ajuda.contains(fileName)) {
+                result.add(ajuda);
             }
         }
 
         return result;
+    }
+
+    @SuppressWarnings("squid:S3457")
+    void readConfig() {
+        File[] files = plugin.getDataFolder().listFiles();
+        if (files == null) {
+            return;
+        }
+
+        for (File file : files) {
+            String content = FileUtil.contentFromFile(file)
+                    .replace("&", "§")
+                    .replace("\r", "");
+            content = String.format("§6---\n%s\n§6---", content);
+
+            String fileName = decodeFileName(file)
+                    .replace("$", "ç");
+            ajudas.put(fileName, content);
+        }
     }
 
     /**
@@ -91,22 +115,13 @@ public final class CommandAjuda implements CommandExecutor, TabCompleter {
      */
     @SuppressWarnings("squid:S3457") // Tem de ser usado \n em vez de %n para mudar de linha corretamente
     private String ajuda(String[] args) throws IOException {
-        File[] files = plugin.getDataFolder().listFiles();
-        if (files == null) {
+        String name = FileUtil.withoutExtension(String.join(" ", args)).toLowerCase();
+        String content = ajudas.get(name);
+        if (content == null) {
             throw new FileNotFoundException();
         }
 
-        String name = FileUtil.withoutExtension(String.join(" ", args));
-
-        for (File file : files) {
-            String fileName = decodeFileName(file);
-            if (fileName.equalsIgnoreCase(name)) {
-                String content = FileUtil.contentFromFile(file.toURI()).replace("&", "§").replace("\r", "");
-                return String.format("§6---\n%s\n§6---", content);
-            }
-        }
-
-        throw new FileNotFoundException();
+        return content;
     }
 
     /**
@@ -115,27 +130,27 @@ public final class CommandAjuda implements CommandExecutor, TabCompleter {
      * @return todas as ajudas disponíveis.
      */
     private String ajudas() {
-        File[] files = plugin.getDataFolder().listFiles();
-        if (files == null) {
-            return "";
-        }
+        List<String> ajudasDisponiveis = new ArrayList<>(ajudas.keySet());
+        StringBuilder ajudasBuilder = new StringBuilder(ChatColor.BLUE.toString());
+        for (int i = 0; i < ajudasDisponiveis.size(); i++) {
+            String ajuda = ajudasDisponiveis.get(i);
+            ajudasBuilder.append(ajuda);
 
-        StringBuilder ajudas = new StringBuilder(ChatColor.BLUE.toString());
-        for (int i = 0; i < files.length; i++) {
-            String fileName = decodeFileName(files[i]);
-            ajudas.append(fileName);
-
-            if (i != files.length - 1) {
-                ajudas.append(ChatColor.GREEN).append(", ").append(ChatColor.BLUE);
+            if (i != ajudasDisponiveis.size() - 1) {
+                ajudasBuilder.append(ChatColor.GREEN).append(", ").append(ChatColor.BLUE);
             }
         }
 
-        return ajudas.toString();
+        return ajudasBuilder.toString();
     }
 
     private String decodeFileName(File file) {
-        String fileName = FileUtil.withoutExtension(file.getName());
-        byte[] bytes = fileName.getBytes();
-        return new String(bytes, StandardCharsets.UTF_8);
+        String fileName = file.getName().toLowerCase();
+        System.out.printf("%s - ", fileName);
+        for (int i = 0; i < fileName.length(); i++) {
+            System.out.printf("'%d' ", (int) fileName.charAt(i));
+        }
+
+        return FileUtil.withoutExtension(fileName);
     }
 }

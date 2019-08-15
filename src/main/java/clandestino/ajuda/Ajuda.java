@@ -24,6 +24,8 @@ public final class Ajuda extends JavaPlugin {
         }
 
         CommandAjuda commandAjuda = new CommandAjuda(this);
+        commandAjuda.readConfig();
+
         command.setExecutor(commandAjuda);
         command.setTabCompleter(commandAjuda);
     }
