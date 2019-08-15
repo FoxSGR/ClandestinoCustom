@@ -12,17 +12,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Comando principal do plugin. Apresenta as ajudas disponíveis
@@ -81,7 +73,7 @@ public final class CommandAjuda implements CommandExecutor, TabCompleter {
 
         String fileName = FileUtil.withoutExtension(String.join(" ", args)).toLowerCase();
         for (File file : files) {
-            String currentFileName = FileUtil.withoutExtension(file.getName()).toLowerCase();
+            String currentFileName = decodeFileName(file).toLowerCase();
             if (currentFileName.contains(fileName)) {
                 result.add(currentFileName);
             }
@@ -99,21 +91,22 @@ public final class CommandAjuda implements CommandExecutor, TabCompleter {
      */
     @SuppressWarnings("squid:S3457") // Tem de ser usado \n em vez de %n para mudar de linha corretamente
     private String ajuda(String[] args) throws IOException {
-        String name = FileUtil.withoutExtension(String.join(" ", args));
-
-        try (Stream<Path> walk = Files.walk(Paths.get(plugin.getDataFolder().toURI()))) {
-            List<Path> paths = walk.collect(Collectors.toList());
-
-            for (Path path : paths) {
-                String fileName = decodeFileName(path.getFileName().toString());
-                if (path.toFile().isFile() && fileName.equalsIgnoreCase(name)) {
-                    String content = FileUtil.contentFromFile(path).replace("&", "§").replace("\r", "");
-                    return String.format("§6---\n%s\n§6---", content);
-                }
-            }
-
+        File[] files = plugin.getDataFolder().listFiles();
+        if (files == null) {
             throw new FileNotFoundException();
         }
+
+        String name = FileUtil.withoutExtension(String.join(" ", args));
+
+        for (File file : files) {
+            String fileName = decodeFileName(file);
+            if (fileName.equalsIgnoreCase(name)) {
+                String content = FileUtil.contentFromFile(file.toURI()).replace("&", "§").replace("\r", "");
+                return String.format("§6---\n%s\n§6---", content);
+            }
+        }
+
+        throw new FileNotFoundException();
     }
 
     /**
@@ -122,36 +115,27 @@ public final class CommandAjuda implements CommandExecutor, TabCompleter {
      * @return todas as ajudas disponíveis.
      */
     private String ajudas() {
-        try (Stream<Path> walk = Files.walk(Paths.get(plugin.getDataFolder().toURI()))) {
-            List<String> files = walk.filter(f -> f.toFile().isFile())
-                    .map(f -> decodeFileName(f.getFileName().toString()))
-                    .collect(Collectors.toList());
-
-            StringBuilder ajudas = new StringBuilder(ChatColor.BLUE.toString());
-            for (int i = 0; i < files.size(); i++) {
-                String fileName = files.get(i);
-                ajudas.append(fileName);
-
-                if (i != files.size() - 1) {
-                    ajudas.append("§a, ").append(ChatColor.BLUE.toString());
-                }
-            }
-
-            return ajudas.toString();
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.WARNING, e.getMessage(), e);
+        File[] files = plugin.getDataFolder().listFiles();
+        if (files == null) {
             return "";
         }
+
+        StringBuilder ajudas = new StringBuilder(ChatColor.BLUE.toString());
+        for (int i = 0; i < files.length; i++) {
+            String fileName = decodeFileName(files[i]);
+            ajudas.append(fileName);
+
+            if (i != files.length - 1) {
+                ajudas.append(ChatColor.GREEN).append(", ").append(ChatColor.BLUE);
+            }
+        }
+
+        return ajudas.toString();
     }
 
-    private String decodeFileName(String fileName) {
-        fileName = FileUtil.withoutExtension(fileName);
-
-        try {
-            return URLDecoder.decode(fileName, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException e) {
-            plugin.getLogger().log(Level.WARNING, e.getMessage(), e);
-            throw new IllegalStateException(e);
-        }
+    private String decodeFileName(File file) {
+        String fileName = FileUtil.withoutExtension(file.getName());
+        byte[] bytes = fileName.getBytes();
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 }
