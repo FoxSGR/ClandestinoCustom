@@ -85,6 +85,7 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
+    @SuppressWarnings("squid:S1168")
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         List<String> result = new ArrayList<>();
         String fileName = FileUtil.withoutExtension(String.join(" ", args)).toLowerCase();
@@ -92,6 +93,10 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
             if (ajuda.contains(fileName)) {
                 result.add(ajuda);
             }
+        }
+
+        if (result.isEmpty()) {
+            return null;
         }
 
         return result;

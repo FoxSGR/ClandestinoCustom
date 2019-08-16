@@ -6,16 +6,19 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
-public class VantagensCommand implements CommandExecutor {
+public class VantagensCommand implements CommandExecutor, TabCompleter {
 
     private final JavaPlugin plugin;
     private final Map<String, String> rankInfos;
@@ -60,6 +63,24 @@ public class VantagensCommand implements CommandExecutor {
             String html = contentFromPage(url);
             rankInfos.put(key.toLowerCase(), html);
         }
+    }
+
+    @Override
+    @SuppressWarnings("squid:S1168")
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        if (args.length == 0) {
+            return new ArrayList<>();
+        }
+
+        List<String> result = rankInfos.keySet().stream()
+                .filter(key -> key.equalsIgnoreCase(args[0]))
+                .collect(Collectors.toList());
+
+        if (result.isEmpty()) {
+            return null;
+        }
+
+        return result;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
