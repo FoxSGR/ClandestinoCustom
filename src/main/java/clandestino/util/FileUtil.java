@@ -1,5 +1,8 @@
 package clandestino.util;
 
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -61,5 +64,21 @@ public final class FileUtil {
         }
 
         return fileName.substring(0, index);
+    }
+
+    public static void saveConfig(FileConfiguration fileConfiguration, File file) {
+        try {
+            fileConfiguration.save(file);
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not save the configuration file " + file.getName(), e);
+        }
+    }
+
+    public static void loadConfig(FileConfiguration fileConfiguration, File file) {
+        try {
+            fileConfiguration.load(file);
+        } catch (IOException | InvalidConfigurationException e) {
+            throw new IllegalStateException("Could not load the configuration file " + file.getName(), e);
+        }
     }
 }

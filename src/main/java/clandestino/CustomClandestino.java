@@ -5,6 +5,7 @@ import clandestino.commands.DiskSpaceCommand;
 import clandestino.commands.SellableCommand;
 import clandestino.commands.VantagensCommand;
 import clandestino.listeners.NetherToOverworldBlocker;
+import clandestino.listeners.PlayerNameFixer;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 

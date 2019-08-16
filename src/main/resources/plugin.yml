@@ -28,6 +28,8 @@ commands:
   vantagens:
     description: Show rank advantagens.
     usage: "Usage: /vantagens [rank]"
+    aliases:
+      - perks
 
 permissions:
   clandestinocustom.*:
