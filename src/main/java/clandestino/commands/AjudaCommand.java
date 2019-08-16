@@ -11,12 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Comando que apresenta as ajudas disponíveis
@@ -78,11 +73,12 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        try {
-            sender.sendMessage(ajuda(args));
-        } catch (IOException e) {
+        String ajuda = ajuda(args);
+        if (ajuda == null) {
             sender.sendMessage(ChatColor.RED + "Ajuda inválida.\n" + ChatColor.GREEN + "Ajudas disponíveis: "
                     + ChatColor.BLUE + ajudas());
+        } else {
+            sender.sendMessage(ajuda(args));
         }
 
         return true;
@@ -108,6 +104,7 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
             return;
         }
 
+        ajudas.clear();
         for (File file : files) {
             String content = FileUtil.contentFromFile(file)
                     .replace("&", "§")
@@ -125,17 +122,11 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
      *
      * @param args os argumentos usados no comando.
      * @return a ajuda encontrada.
-     * @throws IOException gerada se a ajuda não for encontrada.
      */
     @SuppressWarnings("squid:S3457") // Tem de ser usado \n em vez de %n para mudar de linha corretamente
-    private String ajuda(String[] args) throws IOException {
+    private String ajuda(String[] args) {
         String name = FileUtil.withoutExtension(String.join(" ", args)).toLowerCase();
-        String content = ajudas.get(name);
-        if (content == null) {
-            throw new FileNotFoundException();
-        }
-
-        return content;
+        return ajudas.get(name);
     }
 
     /**
@@ -145,6 +136,8 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
      */
     private String ajudas() {
         List<String> ajudasDisponiveis = new ArrayList<>(ajudas.keySet());
+        Collections.sort(ajudasDisponiveis);
+
         StringBuilder ajudasBuilder = new StringBuilder(ChatColor.BLUE.toString());
         for (int i = 0; i < ajudasDisponiveis.size(); i++) {
             String ajuda = ajudasDisponiveis.get(i);
@@ -160,11 +153,6 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
 
     private String decodeFileName(File file) {
         String fileName = file.getName().toLowerCase();
-        System.out.printf("%s - ", fileName);
-        for (int i = 0; i < fileName.length(); i++) {
-            System.out.printf("'%d' ", (int) fileName.charAt(i));
-        }
-
         return FileUtil.withoutExtension(fileName);
     }
 
