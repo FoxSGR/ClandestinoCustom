@@ -6,7 +6,7 @@
 
     <groupId>clandestino</groupId>
     <artifactId>ClandestinoCustom</artifactId>
-    <version>1.5</version>
+    <version>1.7</version>
 
     <properties>
         <java.version>8</java.version>
@@ -41,12 +41,6 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>17.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.BuycraftPlugin.BuycraftX</groupId>
-            <artifactId>BuycraftX</artifactId>
-            <version>v10.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

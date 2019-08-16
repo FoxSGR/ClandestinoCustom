@@ -1,4 +1,4 @@
-name: ${project.artifactId}
+name: ClandestinoCustom
 version: ${project.version}
 author: FoxSGR
 main: clandestino.CustomClandestino
@@ -6,7 +6,6 @@ api-version: 1.14
 
 depend:
   - Essentials
-  - BuycraftX
 
 commands:
   ajuda:
