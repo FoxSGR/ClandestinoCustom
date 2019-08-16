@@ -28,6 +28,7 @@ public final class CustomClandestino extends JavaPlugin {
         registerVantagens();
 
         registerPortalBlocker();
+        registerNameChanger();
     }
 
     private void registerVantagens() {
@@ -35,6 +36,8 @@ public final class CustomClandestino extends JavaPlugin {
         assert command != null;
 
         VantagensCommand vantagensCommand = new VantagensCommand(this);
+        vantagensCommand.readConfig();
+
         command.setExecutor(vantagensCommand);
     }
 
@@ -68,5 +71,10 @@ public final class CustomClandestino extends JavaPlugin {
     private void registerPortalBlocker() {
         NetherToOverworldBlocker netherToOverworldBlocker = new NetherToOverworldBlocker(this);
         getServer().getPluginManager().registerEvents(netherToOverworldBlocker, this);
+    }
+
+    private void registerNameChanger() {
+        PlayerNameFixer playerNameFixer = new PlayerNameFixer();
+        getServer().getPluginManager().registerEvents(playerNameFixer, this);
     }
 }
