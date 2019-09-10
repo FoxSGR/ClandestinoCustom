@@ -54,6 +54,23 @@ public class VantagensCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    @Override
+    @SuppressWarnings("squid:S1168")
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+        List<String> result = new ArrayList<>(rankInfos.keySet());
+        if (args.length == 0) {
+            return result;
+        }
+
+        result = result.stream().filter(key -> key.toLowerCase().contains(args[0].toLowerCase()))
+                .collect(Collectors.toList());
+        if (result.isEmpty()) {
+            return null;
+        }
+
+        return result;
+    }
+
     public void readConfig() {
         FileConfiguration fileConfiguration = createFileConfiguration();
 
@@ -63,24 +80,6 @@ public class VantagensCommand implements CommandExecutor, TabCompleter {
             String html = contentFromPage(url);
             rankInfos.put(key.toLowerCase(), html);
         }
-    }
-
-    @Override
-    @SuppressWarnings("squid:S1168")
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (args.length == 0) {
-            return new ArrayList<>();
-        }
-
-        List<String> result = rankInfos.keySet().stream()
-                .filter(key -> key.equalsIgnoreCase(args[0]))
-                .collect(Collectors.toList());
-
-        if (result.isEmpty()) {
-            return null;
-        }
-
-        return result;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
