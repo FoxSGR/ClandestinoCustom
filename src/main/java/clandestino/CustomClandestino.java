@@ -6,6 +6,7 @@ import clandestino.commands.SellableCommand;
 import clandestino.commands.VantagensCommand;
 import clandestino.listeners.NetherToOverworldBlocker;
 import clandestino.listeners.PlayerNameFixer;
+import clandestino.listeners.PvPTagBugPreventer;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -30,6 +31,7 @@ public final class CustomClandestino extends JavaPlugin {
 
         registerPortalBlocker();
         registerNameChanger();
+        registerPvPTagBugPreventer();
     }
 
     private void registerVantagens() {
@@ -40,6 +42,7 @@ public final class CustomClandestino extends JavaPlugin {
         vantagensCommand.readConfig();
 
         command.setExecutor(vantagensCommand);
+        command.setTabCompleter(vantagensCommand);
     }
 
     private void registerAjuda() {
@@ -77,5 +80,10 @@ public final class CustomClandestino extends JavaPlugin {
     private void registerNameChanger() {
         PlayerNameFixer playerNameFixer = new PlayerNameFixer();
         getServer().getPluginManager().registerEvents(playerNameFixer, this);
+    }
+
+    private void registerPvPTagBugPreventer() {
+        PvPTagBugPreventer pvpTagBugPreventer = new PvPTagBugPreventer();
+        getServer().getPluginManager().registerEvents(pvpTagBugPreventer, this);
     }
 }

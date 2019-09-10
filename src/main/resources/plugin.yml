@@ -14,7 +14,7 @@ commands:
     permission-message: You not have have permission to use this command.
   diskspace:
     description: Disk space analysis command.
-    usage: "Usage: /diskspace (path)"
+    usage: "Usage: /diskspace [sort [amount]] (path)"
     permission-message: You not have have permission to use this command.
   sellable:
     description: Essentials worth list.
