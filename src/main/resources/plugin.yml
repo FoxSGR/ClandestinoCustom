@@ -25,6 +25,9 @@ commands:
       - vendaveis
       - valores
       - valor
+  cc:
+    description: Internal things command.
+    usage: "Usage: /cc"
   vantagens:
     description: Show rank advantagens.
     usage: "Usage: /vantagens [rank]"
@@ -48,4 +51,11 @@ permissions:
         children:
           clandestinocustom.ajuda.reload:
             description: Allows reloading ClandestinoCustom's ajudas command.
+            default: op
+      clandestinocustom.cc.*:
+        description: Allows every internal things command.
+        default: op
+        children:
+          clandestinocustom.cc.autorecocheck:
+            description: If the player has this permission, he is allowed to automatically reconnect using our mod.
             default: op

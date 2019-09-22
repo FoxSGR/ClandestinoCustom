@@ -6,7 +6,7 @@
 
     <groupId>clandestino</groupId>
     <artifactId>ClandestinoCustom</artifactId>
-    <version>1.11</version>
+    <version>1.13</version>
 
     <properties>
         <java.version>8</java.version>

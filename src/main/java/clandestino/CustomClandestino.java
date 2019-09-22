@@ -1,11 +1,8 @@
 package clandestino;
 
-import clandestino.commands.AjudaCommand;
-import clandestino.commands.DiskSpaceCommand;
-import clandestino.commands.SellableCommand;
-import clandestino.commands.VantagensCommand;
+import clandestino.commands.*;
 import clandestino.listeners.NetherToOverworldBlocker;
-import clandestino.listeners.PlayerNameFixer;
+import clandestino.listeners.PlayerDeathListener;
 import clandestino.listeners.PvPTagBugPreventer;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,6 +16,7 @@ public final class CustomClandestino extends JavaPlugin {
     private static final String DISK_SPACE_COMMAND = "diskspace";
     private static final String SELLABLE_COMMAND = "sellable";
     private static final String VANTAGENS_COMMAND = "vantagens";
+    private static final String CC_COMMAND = "CC";
 
     @Override
     public void onEnable() {
@@ -28,6 +26,7 @@ public final class CustomClandestino extends JavaPlugin {
         registerDiskSpaceCommand();
         registerSellable();
         registerVantagens();
+        registerCCCommand();
 
         registerPortalBlocker();
         registerNameChanger();
@@ -72,14 +71,22 @@ public final class CustomClandestino extends JavaPlugin {
         command.setExecutor(sellableCommand);
     }
 
+    private void registerCCCommand() {
+        PluginCommand command = getCommand(CC_COMMAND);
+        assert command != null;
+
+        CCCommand ccCommand = new CCCommand();
+        command.setExecutor(ccCommand);
+    }
+
     private void registerPortalBlocker() {
         NetherToOverworldBlocker netherToOverworldBlocker = new NetherToOverworldBlocker(this);
         getServer().getPluginManager().registerEvents(netherToOverworldBlocker, this);
     }
 
     private void registerNameChanger() {
-        PlayerNameFixer playerNameFixer = new PlayerNameFixer();
-        getServer().getPluginManager().registerEvents(playerNameFixer, this);
+        PlayerDeathListener playerDeathListener = new PlayerDeathListener();
+        getServer().getPluginManager().registerEvents(playerDeathListener, this);
     }
 
     private void registerPvPTagBugPreventer() {

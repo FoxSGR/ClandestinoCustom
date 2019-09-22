@@ -38,6 +38,9 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
      */
     private static final String RELOAD_COMMAND = "reload";
 
+    private static final ChatColor MAIN_COLOR = ChatColor.YELLOW;
+    private static final ChatColor SECONDARY_COLOR = ChatColor.DARK_AQUA;
+
     /**
      * Cria o comando.
      *
@@ -61,22 +64,22 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(ChatColor.GREEN + "Ajudas disponíveis: " + ajudas() + ChatColor.GREEN + "\nEscreve "
-                    + ChatColor.GOLD + "/ajuda (uma ajuda disponível)");
+            sender.sendMessage(MAIN_COLOR + "Ajudas disponíveis: " + ajudas() + MAIN_COLOR + "\nEscreve "
+                    + MAIN_COLOR + "/ajuda (uma ajuda disponível)");
             return true;
         }
 
         if (args[0].equalsIgnoreCase(RELOAD_COMMAND)
                 && sender.hasPermission(CustomClandestino.PERMISSIONS_PREFIX + RELOAD_COMMAND)) {
             readAjudas();
-            sender.sendMessage(ChatColor.AQUA + "Ajudas reloaded.");
+            sender.sendMessage(MAIN_COLOR + "Ajudas reloaded.");
             return true;
         }
 
         String ajuda = ajuda(args);
         if (ajuda == null) {
-            sender.sendMessage(ChatColor.RED + "Ajuda inválida.\n" + ChatColor.GREEN + "Ajudas disponíveis: "
-                    + ChatColor.BLUE + ajudas());
+            sender.sendMessage(ChatColor.RED + "Ajuda inválida.\n" + MAIN_COLOR + "Ajudas disponíveis: "
+                    + SECONDARY_COLOR + ajudas());
         } else {
             sender.sendMessage(ajuda(args));
         }
@@ -143,13 +146,13 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
         List<String> ajudasDisponiveis = new ArrayList<>(ajudas.keySet());
         Collections.sort(ajudasDisponiveis);
 
-        StringBuilder ajudasBuilder = new StringBuilder(ChatColor.BLUE.toString());
+        StringBuilder ajudasBuilder = new StringBuilder(SECONDARY_COLOR.toString());
         for (int i = 0; i < ajudasDisponiveis.size(); i++) {
             String ajuda = ajudasDisponiveis.get(i);
             ajudasBuilder.append(ajuda);
 
             if (i != ajudasDisponiveis.size() - 1) {
-                ajudasBuilder.append(ChatColor.GREEN).append(", ").append(ChatColor.BLUE);
+                ajudasBuilder.append(MAIN_COLOR).append(", ").append(SECONDARY_COLOR);
             }
         }
 
