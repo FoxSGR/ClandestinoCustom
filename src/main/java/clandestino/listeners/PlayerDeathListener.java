@@ -5,7 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
-public class PlayerNameFixer implements Listener {
+public class PlayerDeathListener implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
@@ -17,6 +17,8 @@ public class PlayerNameFixer implements Listener {
         message = replaceName(message, e.getEntity());
         message = replaceName(message, e.getEntity().getKiller());
         e.setDeathMessage(message);
+
+        // TODO: Make better death messages
     }
 
     private static String replaceName(String message, Player player) {

@@ -18,6 +18,7 @@ import org.bukkit.util.Vector;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PvPTagBugPreventer implements Listener {
@@ -35,10 +36,12 @@ public class PvPTagBugPreventer implements Listener {
 
     private Map<Player, BlockBreakInfo> frozenPlayers;
 
+    private static PvPTagBugPreventer instance;
     private static final long BLOCKED_TIME = 500; // milliseconds
 
     public PvPTagBugPreventer() {
         this.frozenPlayers = new ConcurrentHashMap<>();
+        instance = this;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -80,6 +83,14 @@ public class PvPTagBugPreventer implements Listener {
         }
 
         applyFreeze(player, info);
+    }
+
+    public Set<Player> frozenPlayers() {
+        return frozenPlayers.keySet();
+    }
+
+    public static PvPTagBugPreventer getInstance() {
+        return instance;
     }
 
     private boolean shouldFreeze(Player player, Location location) {
