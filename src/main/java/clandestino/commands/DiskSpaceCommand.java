@@ -1,6 +1,7 @@
 package clandestino.commands;
 
-import clandestino.CustomClandestino;
+import clandestino.plugin.ConfigManager;
+import clandestino.plugin.CustomClandestino;
 import clandestino.util.Pair;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -29,7 +30,7 @@ public class DiskSpaceCommand implements CommandExecutor {
     private static final String PERMISSION = CustomClandestino.PERMISSIONS_PREFIX + "diskspace";
     private static final String SORT_COMMAND = "sort";
 
-    private static final String ERROR_PREFIX = ChatColor.RED + "Erro: ";
+    private static final String ERROR_PREFIX = ChatColor.RED + "Error: ";
 
     public DiskSpaceCommand(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -38,7 +39,11 @@ public class DiskSpaceCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!sender.hasPermission(PERMISSION)) {
-            sender.sendMessage(ChatColor.RED + "Não tens permissão.");
+            ConfigManager config = ConfigManager.getInstance();
+            String noPermissionStr = config.getString(
+                    ConfigManager.GENERAL_PREFIX + ConfigManager.LANGUAGE_PREFIX + "no-permission"
+            );
+            sender.sendMessage(noPermissionStr);
             return true;
         }
 
@@ -62,7 +67,7 @@ public class DiskSpaceCommand implements CommandExecutor {
                 try {
                     Path path = Paths.get(args[0]);
                     long size = size(path);
-                    sender.sendMessage(ChatColor.AQUA + "Espaço: " + ChatColor.GRAY + humanReadableByteCount(size));
+                    sender.sendMessage(ChatColor.AQUA + "Size: " + ChatColor.GRAY + humanReadableByteCount(size));
                 } catch (IOException | InvalidPathException e) {
                     plugin.getLogger().log(Level.WARNING, "Error while trying to find size.", e);
                     sender.sendMessage(ERROR_PREFIX + e.getClass().getSimpleName() + "\n" + ChatColor.WHITE
@@ -77,13 +82,13 @@ public class DiskSpaceCommand implements CommandExecutor {
             File folder = new File(name);
 
             if (!folder.isDirectory()) {
-                sender.sendMessage(ERROR_PREFIX + "Não é uma pasta.");
+                sender.sendMessage(ERROR_PREFIX + "Not a folder.");
                 return;
             }
 
             File[] files = folder.listFiles();
             if (files == null) {
-                sender.sendMessage(ERROR_PREFIX + "Essa pasta não existe.");
+                sender.sendMessage(ERROR_PREFIX + "Folder doesn't exist.");
                 return;
             }
 
@@ -137,7 +142,7 @@ public class DiskSpaceCommand implements CommandExecutor {
         } else if (path.toFile().isFile()) {
             return path.toFile().length();
         } else {
-            throw new IOException("O ficheiro/diretório não existe.");
+            throw new IOException("The file/folder doesn't exist.");
         }
     }
 

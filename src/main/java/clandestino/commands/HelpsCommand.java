@@ -1,8 +1,8 @@
 package clandestino.commands;
 
-import clandestino.CustomClandestino;
+import clandestino.plugin.ConfigManager;
+import clandestino.plugin.CustomClandestino;
 import clandestino.util.FileUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,7 +16,7 @@ import java.util.*;
 /**
  * Comando que apresenta as ajudas disponíveis
  */
-public final class AjudaCommand implements CommandExecutor, TabCompleter {
+public final class HelpsCommand implements CommandExecutor, TabCompleter {
 
     /**
      * O plugin em que o comando está registado.
@@ -26,29 +26,26 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
     /**
      * As ajudas disponíveis e os seus conteudos.
      */
-    private final Map<String, String> ajudas;
+    private final Map<String, String> helps;
 
     /**
      * A pasta das ajudas.
      */
-    private static final String AJUDAS_FOLDER = "ajudas";
+    private static final String HELPS_FOLDER = "helps";
 
     /**
      * O sub comando para dar reload.
      */
     private static final String RELOAD_COMMAND = "reload";
 
-    private static final ChatColor MAIN_COLOR = ChatColor.YELLOW;
-    private static final ChatColor SECONDARY_COLOR = ChatColor.DARK_AQUA;
-
     /**
      * Cria o comando.
      *
      * @param plugin o plugin em que o comando está registado.
      */
-    public AjudaCommand(JavaPlugin plugin) {
+    public HelpsCommand(JavaPlugin plugin) {
         this.plugin = plugin;
-        ajudas = new HashMap<>();
+        helps = new HashMap<>();
     }
 
     /**
@@ -64,24 +61,26 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
-            sender.sendMessage(MAIN_COLOR + "Ajudas disponíveis: " + ajudas() + MAIN_COLOR + "\nEscreve "
-                    + MAIN_COLOR + "/ajuda (uma ajuda disponível)");
+            String typeForHelp = getString("type-for-help",
+                    '/' + ConfigManager.getInstance().getString(ConfigManager.HELP_PREFIX + "command-name"));
+            sender.sendMessage(getString("available-helps") + ' ' + ajudas() + '\n' + typeForHelp);
             return true;
         }
 
         if (args[0].equalsIgnoreCase(RELOAD_COMMAND)
                 && sender.hasPermission(CustomClandestino.PERMISSIONS_PREFIX + RELOAD_COMMAND)) {
-            readAjudas();
-            sender.sendMessage(MAIN_COLOR + "Ajudas reloaded.");
+            readHelps();
+            sender.sendMessage(getString("reloaded"));
             return true;
         }
 
-        String ajuda = ajuda(args);
-        if (ajuda == null) {
-            sender.sendMessage(ChatColor.RED + "Ajuda inválida.\n" + MAIN_COLOR + "Ajudas disponíveis: "
-                    + SECONDARY_COLOR + ajudas());
+        String helpName = helpName(args);
+        String help = helps.get(helpName);
+        if (help == null) {
+            sender.sendMessage(getString("invalid-help", helpName) + '\n' + getString("invalid-help-available-helps")
+                    + ' ' + ajudas());
         } else {
-            sender.sendMessage(ajuda(args));
+            sender.sendMessage(help);
         }
 
         return true;
@@ -92,7 +91,7 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         List<String> result = new ArrayList<>();
         String fileName = FileUtil.withoutExtension(String.join(" ", args)).toLowerCase();
-        for (String ajuda : ajudas.keySet()) {
+        for (String ajuda : helps.keySet()) {
             if (ajuda.contains(fileName)) {
                 result.add(ajuda);
             }
@@ -106,35 +105,23 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
     }
 
     @SuppressWarnings("squid:S3457")
-    public void readAjudas() {
+    public void readHelps() {
         File[] files = ajudasFolder().listFiles();
         if (files == null) {
             return;
         }
 
-        ajudas.clear();
+        helps.clear();
         for (File file : files) {
+            String aroundHelp = getString("around-help");
             String content = FileUtil.contentFromFile(file)
                     .replace("&", "§")
                     .replace("\r", "");
-            content = String.format("§6---\n%s\n§6---", content);
+            content = String.format("%s\n%s\n%s", aroundHelp, content, aroundHelp);
 
-            String fileName = decodeFileName(file)
-                    .replace("$", "ç");
-            ajudas.put(fileName, content);
+            String fileName = decodeFileName(file).replace("$", "ç");
+            helps.put(fileName, content);
         }
-    }
-
-    /**
-     * Encontra o conteúdo de uma ajuda.
-     *
-     * @param args os argumentos usados no comando.
-     * @return a ajuda encontrada.
-     */
-    @SuppressWarnings("squid:S3457") // Tem de ser usado \n em vez de %n para mudar de linha corretamente
-    private String ajuda(String[] args) {
-        String name = FileUtil.withoutExtension(String.join(" ", args)).toLowerCase();
-        return ajudas.get(name);
     }
 
     /**
@@ -143,16 +130,18 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
      * @return todas as ajudas disponíveis.
      */
     private String ajudas() {
-        List<String> ajudasDisponiveis = new ArrayList<>(ajudas.keySet());
+        List<String> ajudasDisponiveis = new ArrayList<>(helps.keySet());
         Collections.sort(ajudasDisponiveis);
 
-        StringBuilder ajudasBuilder = new StringBuilder(SECONDARY_COLOR.toString());
+        String listColor = getString("list-color");
+        String listSeparatorColor = getString("list-separator-color");
+        StringBuilder ajudasBuilder = new StringBuilder(listColor);
         for (int i = 0; i < ajudasDisponiveis.size(); i++) {
             String ajuda = ajudasDisponiveis.get(i);
             ajudasBuilder.append(ajuda);
 
             if (i != ajudasDisponiveis.size() - 1) {
-                ajudasBuilder.append(MAIN_COLOR).append(", ").append(SECONDARY_COLOR);
+                ajudasBuilder.append(listSeparatorColor).append(", ").append(listColor);
             }
         }
 
@@ -166,11 +155,20 @@ public final class AjudaCommand implements CommandExecutor, TabCompleter {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private File ajudasFolder() {
-        File folder = new File(plugin.getDataFolder(), AJUDAS_FOLDER);
+        File folder = new File(plugin.getDataFolder(), HELPS_FOLDER);
         if (!folder.exists()) {
             folder.mkdirs();
         }
 
         return folder;
+    }
+
+    private static String helpName(String[] args) {
+        return FileUtil.withoutExtension(String.join(" ", args)).toLowerCase();
+    }
+
+    private static String getString(String key, String... args) {
+        ConfigManager config = ConfigManager.getInstance();
+        return config.getColoredString(ConfigManager.HELP_PREFIX + ConfigManager.LANGUAGE_PREFIX + key, args);
     }
 }

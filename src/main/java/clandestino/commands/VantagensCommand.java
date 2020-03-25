@@ -1,19 +1,18 @@
 package clandestino.commands;
 
-import clandestino.util.FileUtil;
+import clandestino.plugin.ConfigManager;
 import clandestino.util.WebUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -22,8 +21,6 @@ public class VantagensCommand implements CommandExecutor, TabCompleter {
 
     private final JavaPlugin plugin;
     private final Map<String, String> rankInfos;
-
-    private static final String CONFIG_FILE = "vantagens.yml";
 
     public VantagensCommand(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -72,33 +69,18 @@ public class VantagensCommand implements CommandExecutor, TabCompleter {
     }
 
     public void readConfig() {
-        FileConfiguration fileConfiguration = createFileConfiguration();
+        FileConfiguration config = ConfigManager.getInstance().getConfig();
+        ConfigurationSection configuration = config.getConfigurationSection(ConfigManager.VANTAGENS_PREFIX + "urls");
+        if (configuration == null) {
+            throw new IllegalStateException(ConfigManager.VANTAGENS_PREFIX + "urls config section not found.");
+        }
 
-        Set<String> keys = fileConfiguration.getKeys(false);
+        Set<String> keys = configuration.getKeys(false);
         for (String key : keys) {
-            String url = fileConfiguration.getString(key);
+            String url = configuration.getString(key);
             String html = contentFromPage(url);
             rankInfos.put(key.toLowerCase(), html);
         }
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private FileConfiguration createFileConfiguration() {
-        FileConfiguration fileConfiguration = new YamlConfiguration();
-        fileConfiguration.addDefault("vip", "http://vip.com/");
-        fileConfiguration.addDefault("vip+", "http://vip+.com/");
-        fileConfiguration.addDefault("mvp", "http://mvp.com/");
-        fileConfiguration.options().copyDefaults(true);
-
-        File file = new File(plugin.getDataFolder(), CONFIG_FILE);
-        if (!file.exists()) {
-            plugin.getDataFolder().mkdirs();
-            FileUtil.saveConfig(fileConfiguration, file);
-        } else {
-            FileUtil.loadConfig(fileConfiguration, file);
-        }
-
-        return fileConfiguration;
     }
 
     private void sendAvailable(CommandSender sender) {

@@ -1,7 +1,6 @@
 package clandestino.listeners;
 
-import com.SirBlobman.combatlogx.utility.CombatUtil;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import clandestino.plugin.ConfigManager;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -14,6 +13,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
 import java.util.Date;
@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PvPTagBugPreventer implements Listener {
+public class CLXvsGPBugPreventer implements Listener {
 
     private static class BlockBreakInfo {
 
@@ -36,12 +36,13 @@ public class PvPTagBugPreventer implements Listener {
 
     private Map<Player, BlockBreakInfo> frozenPlayers;
 
-    private static PvPTagBugPreventer instance;
-    private static final long BLOCKED_TIME = 500; // milliseconds
+    private static CLXvsGPBugPreventer instance;
 
-    public PvPTagBugPreventer() {
+    public CLXvsGPBugPreventer(JavaPlugin plugin) {
         this.frozenPlayers = new ConcurrentHashMap<>();
         instance = this;
+
+        plugin.getLogger().warning("PvP Tag Bug Prevention is being used but it is not ready in this version.");
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -89,12 +90,13 @@ public class PvPTagBugPreventer implements Listener {
         return frozenPlayers.keySet();
     }
 
-    public static PvPTagBugPreventer getInstance() {
+    public static CLXvsGPBugPreventer getInstance() {
         return instance;
     }
 
     private boolean shouldFreeze(Player player, Location location) {
-        return CombatUtil.isInCombat(player) && GriefPrevention.instance.allowBuild(player, location) != null;
+        return false;
+        // return CombatUtil.isInCombat(player) && GriefPrevention.instance.allowBuild(player, location) != null;
     }
 
     private void freezePlayer(Player player) {
@@ -105,7 +107,8 @@ public class PvPTagBugPreventer implements Listener {
         Date date = info.date;
         Date now = new Date();
         long difference = Math.abs(date.getTime() - now.getTime());
-        if (difference < BLOCKED_TIME) {
+        double freezeTime = ConfigManager.getInstance().getDouble("clx-vs-gp.freeze-time");
+        if (difference < freezeTime) {
             Vector nullVelocity = new Vector();
             player.setVelocity(nullVelocity);
 

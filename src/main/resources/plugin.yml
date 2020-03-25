@@ -1,10 +1,10 @@
 name: ClandestinoCustom
 version: ${project.version}
 author: FoxSGR
-main: clandestino.CustomClandestino
-api-version: 1.14
+main: clandestino.plugin.CustomClandestino
+api-version: 1.15
 
-depend:
+softdepend:
   - Essentials
 
 commands:

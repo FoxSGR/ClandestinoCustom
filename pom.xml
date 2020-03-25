@@ -6,7 +6,7 @@
 
     <groupId>clandestino</groupId>
     <artifactId>ClandestinoCustom</artifactId>
-    <version>1.13</version>
+    <version>1.15</version>
 
     <properties>
         <java.version>8</java.version>
@@ -34,26 +34,13 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.14.4-R0.1-SNAPSHOT</version>
+            <version>1.15.2-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>17.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.SirBlobman.combatlogx</groupId>
-            <artifactId>CombatLogX-API</artifactId>
-            <version>9.0.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.TechFortress</groupId>
-            <artifactId>GriefPrevention</artifactId>
-            <version>16.7.1</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

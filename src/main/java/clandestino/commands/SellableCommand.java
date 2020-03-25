@@ -1,6 +1,6 @@
 package clandestino.commands;
 
-import org.bukkit.ChatColor;
+import clandestino.plugin.ConfigManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -11,15 +11,13 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.logging.Level;
 
 public class SellableCommand implements CommandExecutor {
 
@@ -41,9 +39,7 @@ public class SellableCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length != 0) {
-            sender.sendMessage(ChatColor.RED + "Para ver quanto vale um item, usa o comando " + ChatColor.GREEN
-                    +  "/worth" + ChatColor.RED + " ou " + ChatColor.GREEN + "/worth (nome do item)" + ChatColor.RED
-                    + ".");
+            sender.sendMessage(getString("wrong-syntax"));
             return true;
         }
 
@@ -64,19 +60,16 @@ public class SellableCommand implements CommandExecutor {
         Set<String> keys = worthSection.getKeys(false);
 
         StringBuilder valuesBuilder = new StringBuilder();
-        valuesBuilder.append(ChatColor.YELLOW).append("Items que podes vender usando ")
-                .append(ChatColor.AQUA).append("/sell hand").append(ChatColor.YELLOW).append(" ou ")
-                .append(ChatColor.AQUA).append("/sell (nome do item)").append(ChatColor.YELLOW).append(":\n");
+        valuesBuilder.append(getString("intro")).append('\n');
 
         for (String key : keys) {
             double value = worthSection.getDouble(key);
             double stackValue = value * 64;
 
-            valuesBuilder.append(ChatColor.GRAY).append("- ")
-                    .append(ChatColor.GOLD).append(key).append(ChatColor.GRAY).append(" por ")
-                    .append(ChatColor.GOLD).append(String.format("%.2f", value)).append('Ç')
-                    .append(ChatColor.GRAY).append(" cada (").append(ChatColor.GOLD).append(stackValue).append('Ç')
-                    .append(ChatColor.GRAY).append(" por stack)\n");
+            String strValue = String.format("%.2f%s", value, getString("currency-symbol"));
+            String strStackValue = String.format("%.2f%s", stackValue, getString("currency-symbol"));
+            String line = getString("item-price", key, strValue, strStackValue);
+            valuesBuilder.append(line).append('\n');
         }
 
         values = valuesBuilder.toString();
@@ -121,9 +114,18 @@ public class SellableCommand implements CommandExecutor {
 
             md = digestInputStream.getMessageDigest();
             return md.digest();
+        } catch (FileNotFoundException e) {
+            plugin.getLogger().log(Level.WARNING, "Could not find {0} {1} file.",
+                    new String[] {ESSENTIALS_FOLDER, WORTH_FILE});
+            return new byte[] {};
         } catch (IOException e) {
             plugin.getLogger().warning("Could not calculate the checksum of " + WORTH_FILE);
             return new byte[] {};
         }
+    }
+
+    private static String getString(String key, String... args) {
+        ConfigManager config = ConfigManager.getInstance();
+        return config.getColoredString(ConfigManager.SELLABLE_PREFIX + ConfigManager.LANGUAGE_PREFIX + key, args);
     }
 }

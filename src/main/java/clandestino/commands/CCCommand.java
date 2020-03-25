@@ -1,6 +1,5 @@
 package clandestino.commands;
 
-import clandestino.listeners.PvPTagBugPreventer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,8 +19,6 @@ public class CCCommand implements CommandExecutor {
 
         if (args[0].equalsIgnoreCase(AUTO_RECO_CHECK_COMMAND)) {
             sender.sendMessage(AUTO_RECO_CHECK_COMMAND + sender.hasPermission(AUTO_RECO_CHECK_PERMISSION));
-        } else if (args[0].equalsIgnoreCase("debug")) {
-            sender.sendMessage("Frozen players: " + PvPTagBugPreventer.getInstance().frozenPlayers());
         }
 
         return true;
