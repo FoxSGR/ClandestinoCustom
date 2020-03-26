@@ -100,11 +100,19 @@ public final class CustomClandestino extends JavaPlugin {
     }
 
     private void registerPortalBlocker() {
+        if (!shouldEnable(ConfigManager.NETHER_TO_OVERWORLD_BLOCKER_PREFIX)) {
+            return;
+        }
+
         NetherToOverworldBlocker netherToOverworldBlocker = new NetherToOverworldBlocker(this);
         getServer().getPluginManager().registerEvents(netherToOverworldBlocker, this);
     }
 
     private void registerNameChanger() {
+        if (!shouldEnable(ConfigManager.DEATH_MESSAGE_REPLACER_PREFIX)) {
+            return;
+        }
+
         PlayerDeathListener playerDeathListener = new PlayerDeathListener();
         getServer().getPluginManager().registerEvents(playerDeathListener, this);
     }

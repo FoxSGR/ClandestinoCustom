@@ -21,6 +21,8 @@ public class ConfigManager {
     public static final String HELP_PREFIX = "help.";
     public static final String SELLABLE_PREFIX = "sellable.";
     public static final String VANTAGENS_PREFIX = "vantagens.";
+    public static final String DEATH_MESSAGE_REPLACER_PREFIX = "death-msg-replacer.";
+    public static final String NETHER_TO_OVERWORLD_BLOCKER_PREFIX = "nether-to-overworld-blocker.";
 
     public static final String LANGUAGE_PREFIX = "language.";
     public static final String MODULE_ENABLED = "enabled";
@@ -197,6 +199,9 @@ public class ConfigManager {
         defaults.put(VANTAGENS_PREFIX + MODULE_ENABLED, false);
         defaults.put(VANTAGENS_PREFIX + "urls.vip", "http://vip.com/");
         defaults.put(VANTAGENS_PREFIX + "urls.mvp", "http://mvp.com/");
+
+        defaults.put(DEATH_MESSAGE_REPLACER_PREFIX + MODULE_ENABLED, false);
+        defaults.put(NETHER_TO_OVERWORLD_BLOCKER_PREFIX + MODULE_ENABLED, false);
 
         return defaults;
     }
