@@ -8,8 +8,8 @@ class NetherToOverworldBlockerConfig(plugin: JavaPlugin) : Config(plugin, Nether
     companion object {
         private fun createDefaults(): Map<String, Any> {
             return hashMapOf(
-                    "$LANGUAGE_PREFIX.warning" to "&cNão podes voltar criar um portal aqui.",
-                    "$LANGUAGE_PREFIX.warning-console" to "&cNão podes voltar criar um portal aqui."
+                    "$LANGUAGE_PREFIX.warning" to "&cNão podes criar um portal aqui.",
+                    "$LANGUAGE_PREFIX.warning-console" to "&cCancelada criação de um portal."
             )
         }
     }
