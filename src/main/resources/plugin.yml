@@ -1,7 +1,7 @@
 name: ClandestinoCustom
 version: ${project.version}
 author: FoxSGR
-main: clandestino.plugin.CustomClandestino
+main: net.foxsgr.clandestinocustom.plugin.ClandestinoCustom
 api-version: 1.15
 
 softdepend:
@@ -9,9 +9,11 @@ softdepend:
 
 commands:
   ajuda:
-    description: Obter ajuda.
-    usage: "Uso correto: /ajuda [nome da ajuda]"
+    description: Get help.
+    usage: "Usage: /ajuda [help name]"
     permission-message: You not have have permission to use this command.
+    aliases:
+      - helps
   diskspace:
     description: Disk space analysis command.
     usage: "Usage: /diskspace [sort [amount]] (path)"
@@ -33,6 +35,7 @@ commands:
     usage: "Usage: /vantagens [rank]"
     aliases:
       - perks
+      - advantages
 
 permissions:
   clandestinocustom.*:
